@@ -1,0 +1,12 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+orion:
+  storage:
+    path: ${ORION_STORAGE_PATH:./storage/uploads}
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: ${ORION_MAX_FILE_SIZE:100MB}
+      max-request-size: ${ORION_MAX_REQUEST_SIZE:100MB}
