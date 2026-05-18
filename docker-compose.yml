@@ -1,0 +1,14 @@
+services:
+  orion-backend:
+    build:
+      context: ./backend
+    container_name: orion-backend
+    ports:
+      - "8081:8080"
+    environment:
+      ORION_STORAGE_PATH: /data/orion/uploads
+      ORION_MAX_FILE_SIZE: 100MB
+      ORION_MAX_REQUEST_SIZE: 100MB
+    volumes:
+      - /mnt/stellar-hub-storage/orion/uploads:/data/orion/uploads
+    restart: unless-stopped
