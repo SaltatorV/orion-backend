@@ -54,7 +54,7 @@ public class FileController {
     public ResponseEntity<Void> createDirectory(
             @Valid @RequestBody CreateDirectoryRequest request
     ) throws IOException {
-        fileStorageService.createDirectory(request.name());
+        fileStorageService.createDirectory(request.path());
         return ResponseEntity.ok().build();
     }
 
