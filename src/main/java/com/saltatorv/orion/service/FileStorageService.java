@@ -3,6 +3,7 @@ package com.saltatorv.orion.service;
 import com.saltatorv.orion.config.StorageProperties;
 import com.saltatorv.orion.dto.FileItemDto;
 import com.saltatorv.orion.dto.PageResponse;
+import com.saltatorv.orion.entity.FileMetadata;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,7 @@ public class FileStorageService {
 
     private final StorageProperties storageProperties;
     private final StoragePathService storagePathService;
+    private final FileMetadataService fileMetadataService;
 
     public void upload(MultipartFile file, String directory) throws IOException {
         Path targetDirectory = resolveDirectory(directory);
@@ -47,10 +49,14 @@ public class FileStorageService {
                             String fileName = path.getFileName().toString();
                             String relativePath = buildRelativePath(directory, fileName);
 
+                            FileMetadata metadata = fileMetadataService.getOrCreate(relativePath);
+
                             return new FileItemDto(
                                     fileName,
                                     relativePath,
-                                    Files.size(path)
+                                    Files.size(path),
+                                    metadata.isPrinted(),
+                                    metadata.isFavorite()
                             );
                         } catch (IOException e) {
                             throw new RuntimeException(e);

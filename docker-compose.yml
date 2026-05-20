@@ -7,8 +7,9 @@ services:
       - "8081:8080"
     environment:
       ORION_STORAGE_PATH: /data/orion/uploads
+      ORION_DB_PATH: /data/orion/orion.db
       ORION_MAX_FILE_SIZE: 100MB
       ORION_MAX_REQUEST_SIZE: 100MB
     volumes:
-      - /mnt/stellar-hub-storage/orion/uploads:/data/orion/uploads
+      - /mnt/stellar-hub-storage/orion:/data/orion
     restart: unless-stopped
