@@ -18,6 +18,7 @@ public class FileStorageService {
 
     private final StorageProperties storageProperties;
     private final StoragePathService storagePathService;
+
     public void upload(MultipartFile file, String directory) throws IOException {
         Path targetDirectory = resolveDirectory(directory);
         Files.createDirectories(targetDirectory);

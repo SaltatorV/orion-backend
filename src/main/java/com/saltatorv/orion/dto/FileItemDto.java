@@ -3,6 +3,8 @@ package com.saltatorv.orion.dto;
 public record FileItemDto(
         String name,
         String path,
-        long size
+        long size,
+        boolean printed,
+        boolean favorite
 ) {
 }
