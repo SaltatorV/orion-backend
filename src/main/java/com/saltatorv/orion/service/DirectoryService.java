@@ -112,4 +112,22 @@ public class DirectoryService {
                     });
         }
     }
+
+    public List<DirectoryItemDto> listAllDirectories() throws IOException {
+
+        Path root = storagePathService.root();
+
+        try (var walk = Files.walk(root)) {
+
+            return walk
+                    .filter(Files::isDirectory)
+                    .filter(path -> !path.equals(root))
+                    .sorted()
+                    .map(path -> new DirectoryItemDto(
+                            path.getFileName().toString(),
+                            storagePathService.toRelativePath(path)
+                    ))
+                    .toList();
+        }
+    }
 }

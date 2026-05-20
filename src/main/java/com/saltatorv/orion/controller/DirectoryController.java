@@ -73,4 +73,13 @@ public class DirectoryController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(stream);
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<DirectoryItemDto>> listAllDirectories()
+            throws IOException {
+
+        return ResponseEntity.ok(
+                directoryService.listAllDirectories()
+        );
+    }
 }
