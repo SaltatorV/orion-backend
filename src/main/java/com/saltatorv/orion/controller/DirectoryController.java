@@ -6,8 +6,11 @@ import com.saltatorv.orion.dto.RenameDirectoryRequest;
 import com.saltatorv.orion.service.DirectoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,5 +51,26 @@ public class DirectoryController {
     ) throws IOException {
         directoryService.deleteDirectory(path);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<StreamingResponseBody> downloadDirectory(
+            @RequestParam String path
+    ) {
+        String filename = path == null || path.isBlank()
+                ? "orion-root"
+                : path.substring(path.lastIndexOf("/") + 1);
+
+        StreamingResponseBody stream = outputStream -> {
+            directoryService.zipDirectory(path, outputStream);
+        };
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + filename + ".zip\""
+                )
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(stream);
     }
 }
