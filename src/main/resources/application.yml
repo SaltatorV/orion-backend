@@ -10,3 +10,12 @@ spring:
     multipart:
       max-file-size: ${ORION_MAX_FILE_SIZE:100MB}
       max-request-size: ${ORION_MAX_REQUEST_SIZE:100MB}
+  datasource:
+    url: jdbc:sqlite:${ORION_DB_PATH:./storage/orion.db}
+    driver-class-name: org.sqlite.JDBC
+
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
