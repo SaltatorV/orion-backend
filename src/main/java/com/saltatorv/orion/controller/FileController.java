@@ -1,6 +1,7 @@
 package com.saltatorv.orion.controller;
 
 import com.saltatorv.orion.dto.*;
+import com.saltatorv.orion.service.FileMetadataService;
 import com.saltatorv.orion.service.FileStorageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.List;
 public class FileController {
 
     private final FileStorageService fileStorageService;
+    private final FileMetadataService fileMetadataService;
 
     @PostMapping("/upload")
     public ResponseEntity<Void> upload(
@@ -115,5 +117,11 @@ public class FileController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @PatchMapping("/printed")
+    public ResponseEntity<Void> updatePrinted(
+            @RequestBody UpdatePrintedRequest request
+    ) {
+        fileMetadataService.updatePrinted(request.path(), request.printed());
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -23,4 +23,10 @@ public class FileMetadataService {
     public void delete(String path) {
         repository.deleteByPath(path);
     }
+
+    public FileMetadata updatePrinted(String path, boolean printed) {
+        FileMetadata metadata = getOrCreate(path);
+        metadata.setPrinted(printed);
+        return repository.save(metadata);
+    }
 }
