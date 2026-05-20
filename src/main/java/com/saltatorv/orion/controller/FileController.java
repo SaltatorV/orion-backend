@@ -1,8 +1,6 @@
 package com.saltatorv.orion.controller;
 
-import com.saltatorv.orion.dto.CreateDirectoryRequest;
-import com.saltatorv.orion.dto.FileItemDto;
-import com.saltatorv.orion.dto.PageResponse;
+import com.saltatorv.orion.dto.*;
 import com.saltatorv.orion.service.FileStorageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +56,7 @@ public class FileController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/download")
+    @GetMapping("/preview")
     public ResponseEntity<Resource> getFile(
             @RequestParam String path
     ) throws IOException {
@@ -78,4 +76,44 @@ public class FileController {
         fileStorageService.delete(path);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/download")
+    public ResponseEntity<Resource> downloadFile(
+            @RequestParam String path
+    ) throws IOException {
+
+        Path file = fileStorageService.getFile(path);
+        Resource resource = new UrlResource(file.toUri());
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + file.getFileName() + "\""
+                )
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
+    @PatchMapping("/rename")
+    public ResponseEntity<Void> renameFile(
+            @Valid @RequestBody RenameFileRequest request
+    ) throws IOException {
+        fileStorageService.renameFile(request.path(), request.newName());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/move")
+    public ResponseEntity<Void> moveFile(
+            @Valid @RequestBody MoveFileRequest request
+    ) throws IOException {
+
+        fileStorageService.moveFile(
+                request.sourcePath(),
+                request.targetDirectory()
+        );
+
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

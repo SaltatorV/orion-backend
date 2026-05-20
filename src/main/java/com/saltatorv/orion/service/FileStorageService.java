@@ -17,7 +17,7 @@ import java.util.List;
 public class FileStorageService {
 
     private final StorageProperties storageProperties;
-
+    private final StoragePathService storagePathService;
     public void upload(MultipartFile file, String directory) throws IOException {
         Path targetDirectory = resolveDirectory(directory);
         Files.createDirectories(targetDirectory);
@@ -139,5 +139,79 @@ public class FileStorageService {
         }
 
         return directory + "/" + fileName;
+    }
+
+    public void renameFile(String path, String newName) throws IOException {
+        Path source = getFile(path);
+
+        if (!Files.exists(source) || !Files.isRegularFile(source)) {
+            throw new NoSuchFileException("File does not exist: " + path);
+        }
+
+        String safeNewName = Path.of(newName).getFileName().toString();
+
+        if (!hasExtension(safeNewName)) {
+            safeNewName = safeNewName + getExtension(source.getFileName().toString());
+        }
+        Path target = source.getParent()
+                .resolve(safeNewName)
+                .normalize();
+
+        if (!target.startsWith(Paths.get(storageProperties.getPath()).toAbsolutePath().normalize())) {
+            throw new SecurityException("Invalid target path");
+        }
+        if (Files.exists(target)) {
+            throw new FileAlreadyExistsException("File already exists: " + safeNewName);
+        }
+
+        Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
+    }
+
+    private String getExtension(String filename) {
+        int index = filename.lastIndexOf('.');
+
+        if (index == -1) {
+            return "";
+        }
+
+        return filename.substring(index);
+    }
+    public void moveFile(
+            String sourcePath,
+            String targetDirectory
+    ) throws IOException {
+
+        Path source = getFile(sourcePath);
+
+        if (!Files.exists(source) || !Files.isRegularFile(source)) {
+            throw new NoSuchFileException("File does not exist: " + sourcePath);
+        }
+
+        Path targetDir = storagePathService.resolve(targetDirectory);
+
+        if (!Files.exists(targetDir) || !Files.isDirectory(targetDir)) {
+            throw new NoSuchFileException("Directory does not exist: " + targetDirectory);
+        }
+
+        Path target = targetDir
+                .resolve(source.getFileName())
+                .normalize();
+
+        if (!target.startsWith(storagePathService.root())) {
+            throw new SecurityException("Invalid target path");
+        }
+
+        if (Files.exists(target)) {
+            throw new FileAlreadyExistsException(
+                    "File already exists in target directory"
+            );
+        }
+
+        Files.move(source, target);
+    }
+
+
+    private boolean hasExtension(String filename) {
+        return filename.lastIndexOf('.') > 0;
     }
 }
