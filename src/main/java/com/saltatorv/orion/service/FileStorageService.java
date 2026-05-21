@@ -119,6 +119,8 @@ public class FileStorageService {
         }
 
         Files.deleteIfExists(file);
+        thumbnailService.deleteThumbnail(file.getFileName().toString());
+        fileMetadataService.delete(file.getFileName().toString());
     }
 
     private Path resolveDirectory(String directory) {
@@ -175,6 +177,9 @@ public class FileStorageService {
         }
 
         Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
+        String newRelativePath = storagePathService.toRelativePath(target);
+        thumbnailService.moveThumbnail(path, newRelativePath);
+        fileMetadataService.movePath(path, newRelativePath);
     }
 
     private String getExtension(String filename) {
@@ -218,6 +223,9 @@ public class FileStorageService {
         }
 
         Files.move(source, target);
+        String newRelativePath = storagePathService.toRelativePath(target);
+        thumbnailService.moveThumbnail(sourcePath, newRelativePath);
+        fileMetadataService.movePath(sourcePath, newRelativePath);
     }
 
 
