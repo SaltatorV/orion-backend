@@ -34,7 +34,7 @@ public class FileStorageService {
         thumbnailService.generateThumbnail(relativePath);
     }
 
-    public PageResponse<FileItemDto> getFiles(String directory, int page, int size) throws IOException {
+    public PageResponse<FileItemDto> getFiles(String directory, int page, int size, Boolean printed) {
         Path targetDirectory = resolveDirectory(directory);
 
         if (!Files.exists(targetDirectory)) {
@@ -65,7 +65,10 @@ public class FileStorageService {
                             throw new RuntimeException(e);
                         }
                     })
+                    .filter(file -> printed == null || file.printed() == printed)
                     .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         int fromIndex = Math.min(page * size, allFiles.size());

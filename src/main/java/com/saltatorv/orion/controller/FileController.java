@@ -40,10 +40,11 @@ public class FileController {
     public ResponseEntity<PageResponse<FileItemDto>> getFiles(
             @RequestParam(value = "directory", required = false) String directory,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(value = "printed", required = false) Boolean printed
     ) throws IOException {
         return ResponseEntity.ok(
-                fileStorageService.getFiles(directory, page, size)
+                fileStorageService.getFiles(directory, page, size, printed)
         );
     }
 
