@@ -3,6 +3,7 @@ package com.saltatorv.orion.controller;
 import com.saltatorv.orion.dto.*;
 import com.saltatorv.orion.service.FileMetadataService;
 import com.saltatorv.orion.service.FileStorageService;
+import com.saltatorv.orion.service.ThumbnailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -24,6 +25,7 @@ public class FileController {
 
     private final FileStorageService fileStorageService;
     private final FileMetadataService fileMetadataService;
+    private final ThumbnailService thumbnailService;
 
     @PostMapping("/upload")
     public ResponseEntity<Void> upload(
@@ -123,5 +125,23 @@ public class FileController {
     ) {
         fileMetadataService.updatePrinted(request.path(), request.printed());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/thumbnail")
+    public ResponseEntity<Resource> getThumbnail(
+            @RequestParam String path
+    ) throws IOException {
+
+        if (!thumbnailService.thumbnailExists(path)) {
+            thumbnailService.generateThumbnail(path);
+        }
+
+        Path thumbnail = thumbnailService.getThumbnailPath(path);
+        Resource resource = new UrlResource(thumbnail.toUri());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + thumbnail.getFileName() + "\"")
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(resource);
     }
 }

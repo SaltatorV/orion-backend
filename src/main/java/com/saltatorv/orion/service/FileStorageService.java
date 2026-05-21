@@ -20,6 +20,7 @@ public class FileStorageService {
     private final StorageProperties storageProperties;
     private final StoragePathService storagePathService;
     private final FileMetadataService fileMetadataService;
+    private final ThumbnailService thumbnailService;
 
     public void upload(MultipartFile file, String directory) throws IOException {
         Path targetDirectory = resolveDirectory(directory);
@@ -29,6 +30,8 @@ public class FileStorageService {
         Path target = targetDirectory.resolve(filename);
 
         Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+        String relativePath = buildRelativePath(directory, filename);
+        thumbnailService.generateThumbnail(relativePath);
     }
 
     public PageResponse<FileItemDto> getFiles(String directory, int page, int size) throws IOException {

@@ -18,8 +18,8 @@ public class DirectoryService {
 
     private final StoragePathService storagePathService;
 
-    public List<DirectoryItemDto> listDirectories(String path) throws IOException {
-        Path directory = storagePathService.resolve(path);
+    public List<DirectoryItemDto> listDirectories(String pathToResolve) throws IOException {
+        Path directory = storagePathService.resolve(pathToResolve);
 
         if (!Files.exists(directory)) {
             return List.of();
@@ -28,6 +28,7 @@ public class DirectoryService {
         try (var stream = Files.list(directory)) {
             return stream
                     .filter(Files::isDirectory)
+                    .filter(path -> !path.getFileName().toString().equals(".thumbnails"))
                     .sorted(Comparator.comparing(p -> p.getFileName().toString()))
                     .map(p -> new DirectoryItemDto(
                             p.getFileName().toString(),
@@ -122,6 +123,7 @@ public class DirectoryService {
             return walk
                     .filter(Files::isDirectory)
                     .filter(path -> !path.equals(root))
+                    .filter(path -> !storagePathService.toRelativePath(path).startsWith(".thumbnails"))
                     .sorted()
                     .map(path -> new DirectoryItemDto(
                             path.getFileName().toString(),
